@@ -35,14 +35,9 @@ export function parseKmlRoute(xml) {
   return collection;
 }
 
-export async function getRouteGeometry(code) {
-  const source = routeSources[code];
-  if (!source) return null;
-  if (routeDetails[code]?.geometry) return routeDetails[code].geometry;
-  if (geometryCache.has(code)) return geometryCache.get(code);
-
+export async function fetchRouteGeometry(mapId) {
   const url = new URL('https://www.google.com/maps/d/kml');
-  url.searchParams.set('mid', source.mapId);
+  url.searchParams.set('mid', mapId);
   url.searchParams.set('forcekml', '1');
 
   const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
@@ -55,6 +50,16 @@ export async function getRouteGeometry(code) {
     throw new Error('A origem não retornou geometria para esta linha.');
   }
 
+  return geometry;
+}
+
+export async function getRouteGeometry(code) {
+  const source = routeSources[code];
+  if (!source) return null;
+  if (routeDetails[code]?.geometry) return routeDetails[code].geometry;
+  if (geometryCache.has(code)) return geometryCache.get(code);
+
+  const geometry = await fetchRouteGeometry(source.mapId);
   geometryCache.set(code, geometry);
   return geometry;
 }

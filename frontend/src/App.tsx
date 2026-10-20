@@ -118,7 +118,9 @@ function App() {
     return () => controller.abort();
   }, [selectedLine]);
 
-  const routeData = routeResult?.code === selectedLine?.code ? routeResult.data ?? null : null;
+  const routeData = routeResult && routeResult.code === selectedLine?.code
+    ? routeResult.data ?? null
+    : null;
   const routeError = !selectedLine?.route
     ? selectedLine ? 'Esta linha ainda não possui geometria oficial cadastrada.' : ''
     : routeResult?.code === selectedLine.code ? routeResult.error ?? '' : '';

@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
-import { getRouteGeometry } from '../src/routeService.js';
+import { fetchRouteGeometry } from '../src/routeService.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const routeSources = JSON.parse(
@@ -21,7 +21,7 @@ for (const [code, source] of Object.entries(routeSources)) {
     itinerary: parse(officialLine.itinerario).text.trim(),
     sourceUrl: `https://smtt.aracaju.se.gov.br/wp-json/wp/v2/linha_onibus/${source.sourceId}`,
     modifiedAt: officialLine.modified,
-    geometry: await getRouteGeometry(code),
+    geometry: await fetchRouteGeometry(source.mapId),
   };
   console.log(`Importada linha ${code}`);
 }

@@ -25,6 +25,15 @@ cd backend
 npm run dev
 ```
 
+Para atualizar o banco local com itinerários e geometrias publicados pela SMTT:
+
+```bash
+npm run import:routes
+```
+
+O comando grava os itinerários e as geometrias GeoJSON em `backend/data/routeDetails.json`.
+O mapa usa Leaflet com tiles do OpenStreetMap; as geometrias são as publicadas nos mapas da SMTT.
+
 ### Frontend
 
 ```bash
