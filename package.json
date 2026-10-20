@@ -1,0 +1,22 @@
+{
+  "name": "movearacaju",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev -- --host 0.0.0.0",
+    "test:backend": "cd backend && npm test",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "aracaju",
+    "mobility",
+    "buses",
+    "transport"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
