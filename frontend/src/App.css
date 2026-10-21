@@ -1169,20 +1169,43 @@
 
   .search-box {
     grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
   }
 
   .search-box label {
     grid-column: 1 / -1;
   }
 
+  .search-box label:first-of-type {
+    grid-row: 1;
+  }
+
+  .search-box label:nth-of-type(2) {
+    grid-row: 2;
+  }
+
+  .search-box input {
+    width: 100%;
+    min-width: 0;
+  }
+
   .search-box .swap-button {
     grid-column: 1;
+    grid-row: 3;
     justify-self: start;
+    width: 52px;
+    min-height: 48px;
+    padding: 0;
   }
 
   .search-box .primary-button {
     grid-column: 2;
     grid-row: 3;
+    justify-self: end;
+  }
+
+  .route-workspace {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .news-grid,
@@ -1195,6 +1218,11 @@
 
   .news-tools {
     grid-template-columns: 1fr;
+  }
+
+  .map-canvas {
+    height: min(55svh, 480px);
+    min-height: 320px;
   }
 
   .mobile-nav {
