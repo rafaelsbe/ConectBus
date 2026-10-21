@@ -145,6 +145,10 @@ app.post('/api/reports', (req, res) => {
   return res.status(201).json({ data: report });
 });
 
-app.listen(port, () => {
-  console.log(`MoveAracaju API listening on http://localhost:${port}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`MoveAracaju API listening on http://localhost:${port}`);
+  });
+}
+
+export default app;

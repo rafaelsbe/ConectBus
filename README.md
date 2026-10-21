@@ -55,6 +55,14 @@ cd frontend
 npm run build
 ```
 
+## Deploy na Vercel
+
+O `vercel.json` na raiz configura dois serviços no mesmo projeto: `backend` (Express) e `frontend` (Vite). As requisições `/api/*` são encaminhadas ao backend; as demais rotas públicas vão para o frontend. O frontend já usa caminhos relativos `/api/...`, então não precisa de URL de backend em build ou variável pública.
+
+Não há binding entre serviços: o frontend chama a API no navegador pelo caminho público `/api`, e nenhum serviço faz chamadas servidor-a-servidor para o outro. O backend exporta o app Express para a Vercel e só abre a porta local fora do runtime da Vercel.
+
+Para desenvolvimento local, use `npm run backend` e `npm run frontend`. O proxy Vite continua apontando para `http://localhost:4000` apenas durante o desenvolvimento.
+
 ## Observações
 
 - A base inicial de linhas foi carregada em `backend/data/seed.json`.
