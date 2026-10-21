@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { searchLines, normalizeText } from './src/searchService.js';
 import { getRouteDetails, getRouteGeometry, getRouteSource } from './src/routeService.js';
+import { getOfficialNews } from './src/newsService.js';
 
 dotenv.config();
 
@@ -88,67 +89,38 @@ app.get('/api/lines/:idOrCode/route', async (req, res) => {
 });
 
 app.get('/api/alerts', (req, res) => {
+  const line = seedData.lines.find((item) => item.code === '001');
+  const simulatedAt = new Date().toISOString();
   const alerts = [
     {
-      id: 'alert-1',
-      title: 'Atraso em linha 021',
-      description: 'A linha 021 apresentou atraso na região do centro por causa de trânsito.',
-      affectedLines: ['021'],
-      category: 'delay',
+      id: 'simulation-mechanical-issue',
+      title: 'Ônibus com problema mecânico',
+      description: 'Esta ocorrência é uma simulação para demonstração. Não há confirmação de problema mecânico em veículos ou linhas em operação.',
+      affectedLines: [line.code],
+      lineName: line.name,
+      category: 'mechanical_issue',
       severity: 'medium',
-      status: 'confirmed',
-      occurredAt: '2026-10-20T08:15:00.000Z',
-      createdAt: '2026-10-20T08:30:00.000Z',
-      updatedAt: '2026-10-20T08:30:00.000Z',
-      source: 'Relato da SMTT',
-      validation: 'confirmed by admin'
-    },
-    {
-      id: 'alert-2',
-      title: 'Report de ônibus quebrado',
-      description: 'Usuário reportou ônibus quebrado na linha 007.',
-      affectedLines: ['007'],
-      category: 'broken_bus',
-      severity: 'high',
-      status: 'pending',
-      occurredAt: '2026-10-20T09:00:00.000Z',
-      createdAt: '2026-10-20T09:05:00.000Z',
-      updatedAt: '2026-10-20T09:05:00.000Z',
-      source: 'Relato de usuário',
-      validation: 'pending review'
+      status: 'simulation',
+      occurredAt: simulatedAt,
+      createdAt: simulatedAt,
+      updatedAt: simulatedAt,
+      source: 'Demonstração ConectBus',
+      sourceType: 'simulation',
+      validation: 'not_applicable',
+      affectedSegment: null,
     }
   ];
 
   res.json({ data: alerts, total: alerts.length });
 });
 
-app.get('/api/news', (req, res) => {
-  const news = [
-    {
-      id: 'news-1',
-      title: 'SMTT reforça comunicação sobre mudanças de itinerário',
-      summary: 'A prefeitura publicou informações sobre ajustes e linhas em operação.',
-      category: 'mobilidade',
-      source: 'SMTT Aracaju',
-      sourceUrl: 'https://smtt.aracaju.se.gov.br/',
-      publishedAt: '2026-10-20T12:00:00.000Z',
-      createdAt: '2026-10-20T12:00:00.000Z',
-      status: 'published'
-    },
-    {
-      id: 'news-2',
-      title: 'Linha 022 altera trajeto devido às obras viárias',
-      summary: 'A SMTT informa alterações no itinerário da linha 022 por obras no complexo viário.',
-      category: 'transporte',
-      source: 'SMTT Aracaju',
-      sourceUrl: 'https://smtt.aracaju.se.gov.br/noticias/smtt-altera-itinerario-da-linha-022-barra-dia-devido-as-obras-do-complexo-viario-maria-do-carmo/',
-      publishedAt: '2026-10-20T13:00:00.000Z',
-      createdAt: '2026-10-20T13:00:00.000Z',
-      status: 'published'
-    }
-  ];
-
-  res.json({ data: news, total: news.length });
+app.get('/api/news', async (req, res) => {
+  try {
+    return res.json(await getOfficialNews());
+  } catch (error) {
+    console.error('Não foi possível carregar notícias oficiais da SMTT:', error);
+    return res.status(502).json({ error: 'Não foi possível consultar as notícias oficiais da SMTT. Tente novamente ou acesse o site da SMTT.' });
+  }
 });
 
 app.post('/api/reports', (req, res) => {

@@ -1,6 +1,6 @@
 # MoveAracaju
 
-Aplicação de mobilidade urbana para Aracaju, com base de linhas, pesquisa de trajetos, alertas e notícias.
+Aplicação de mobilidade urbana para Aracaju, com linhas e itinerários da SMTT, notícias do feed oficial, orientações de cartões e uma ocorrência claramente identificada como demonstração.
 
 ## Requisitos
 
@@ -60,3 +60,7 @@ npm run build
 - A base inicial de linhas foi carregada em `backend/data/seed.json`.
 - A busca de trajetos é tratada por normalização de textos e considera ausência de dados confiáveis como limite da operação.
 - Nenhuma base de GPS em tempo real foi implementada.
+- `/api/news` consulta o feed público do WordPress da SMTT (cache de cinco minutos). Uma falha da fonte é apresentada como erro, sem substituir as notícias por conteúdo inventado.
+- `/api/alerts` disponibiliza somente uma ocorrência de demonstração, com horário de geração e identificação explícita de simulação; não representa uma integração operacional.
+- As informações sobre cartões são orientativas e direcionam para os canais oficiais. O ConectBus não emite cartões, realiza recargas ou envia solicitações.
+- O perfil é inteiramente demonstrativo e não implementa autenticação ou armazenamento de informações pessoais.

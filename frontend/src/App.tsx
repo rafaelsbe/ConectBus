@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import RouteMap from './components/RouteMap';
+import { AlertsPage, CardsPage, NewsPage, ProfilePage } from './components/InfoPages';
 import './App.css';
+
+type Page = 'inicio' | 'noticias' | 'cartoes' | 'alertas' | 'perfil';
+
+const pageFromHash = (): Page => {
+  const hash = window.location.hash.slice(1);
+  if (hash === 'noticias' || hash === 'cartoes' || hash === 'alertas' || hash === 'perfil') return hash;
+  return 'inicio';
+};
 
 type RouteSource = {
   sourceId: number;
@@ -55,6 +64,7 @@ const searchLines = (lines: BusLine[], origin: string, destination: string) => {
 };
 
 function App() {
+  const [page, setPage] = useState<Page>(pageFromHash);
   const [lines, setLines] = useState<BusLine[]>([]);
   const [origin, setOrigin] = useState('Fernando Collor');
   const [destination, setDestination] = useState('D.I.A.');
@@ -65,6 +75,12 @@ function App() {
   const [selectedCode, setSelectedCode] = useState('');
   const [routeResult, setRouteResult] = useState<RouteResult | null>(null);
   const [loadingError, setLoadingError] = useState('');
+
+  useEffect(() => {
+    const handleHashChange = () => setPage(pageFromHash());
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -138,18 +154,52 @@ function App() {
     setSelectedCode('');
   };
 
+  const navigateTo = (nextPage: Page) => {
+    window.location.hash = nextPage;
+    setPage(nextPage);
+  };
+
+  const openAlertRoute = (code: string) => {
+    const line = lines.find((item) => item.code === code);
+    if (!line) {
+      navigateTo('inicio');
+      setLoadingError('Não foi possível localizar a linha indicada no alerta demonstrativo.');
+      return;
+    }
+    setOrigin(line.origin);
+    setDestination(line.destination);
+    setSubmittedRoute({ origin: line.origin, destination: line.destination });
+    setSelectedCode(line.code);
+    navigateTo('inicio');
+  };
+
+  const navigation: { id: Page; label: string }[] = [
+    { id: 'inicio', label: 'Rotas' },
+    { id: 'noticias', label: 'Notícias' },
+    { id: 'cartoes', label: 'Cartões' },
+    { id: 'alertas', label: 'Alertas' },
+    { id: 'perfil', label: 'Perfil demo' },
+  ];
+
   return (
     <div className="app-shell">
       <header className="topbar">
-        <a className="brand" href="#inicio">ConectBus</a>
+        <a className="brand" href="#inicio" aria-label="ConectBus — início"><span className="brand-mark" aria-hidden="true">C</span>ConectBus</a>
         <nav aria-label="Navegação principal">
-          <a href="#inicio">Início</a>
-          <a href="#linhas">Linhas</a>
-          <a href="https://smtt.aracaju.se.gov.br/itinerario-e-horario-de-onibus/" target="_blank" rel="noreferrer">SMTT</a>
+          {navigation.map((item) => (
+            <a key={item.id} href={`#${item.id}`} className={page === item.id ? 'active' : ''} aria-current={page === item.id ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))}
         </nav>
       </header>
 
-      <main className="page" id="inicio">
+      {page === 'noticias' ? <NewsPage /> : null}
+      {page === 'cartoes' ? <CardsPage /> : null}
+      {page === 'alertas' ? <AlertsPage onOpenRoute={openAlertRoute} /> : null}
+      {page === 'perfil' ? <ProfilePage /> : null}
+
+      {page === 'inicio' ? <main className="page" id="inicio">
         <section className="hero-card">
           <div>
             <p className="eyebrow">Transporte coletivo · Aracaju e região</p>
@@ -236,7 +286,16 @@ function App() {
             ) : null}
           </section>
         </section>
-      </main>
+      </main> : null}
+
+      <nav className="mobile-nav" aria-label="Navegação móvel">
+        {navigation.map((item) => (
+          <a key={item.id} href={`#${item.id}`} className={page === item.id ? 'active' : ''} aria-current={page === item.id ? 'page' : undefined}>
+            <span aria-hidden="true">{item.id === 'inicio' ? '⌂' : item.id === 'noticias' ? '▤' : item.id === 'cartoes' ? '▣' : item.id === 'alertas' ? '!' : '●'}</span>
+            {item.label}
+          </a>
+        ))}
+      </nav>
     </div>
   );
 }
